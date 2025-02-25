@@ -69,7 +69,8 @@ ok_load_setup:
     movw $0x01301, %ax   # %ah = 0x13 means display character string in teletype mode, %al = 0x01 means character string not only contains characters, but also properties of how should we display them  (e.g., color)
     movw $RED_COLOR, %bx # Set text color to red
     movw $MSGLEN, %cx
-    movb $0, %dl         # Position of the cursor, row number = %dh, column number = %dl
+    movb $0, %dh         # Start position of where to print characters, row number = %dh, column number = %dl
+    movb $0, %dl
     int $INTERRUPTION_TO_DISPLAY_CHARACTER
 
     jmpl $SETUPSEG, $0   # Does two things, 1) set %cs = $SETUPSEG, 2) jump to $0
