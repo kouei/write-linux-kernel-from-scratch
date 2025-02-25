@@ -58,12 +58,12 @@ load_setup:
     movw $SECTOR_SIZE_IN_BYTES, %bx    # (%es << 4) + %bx is the address of the buffer. If there is any error, the CF bit will be set
     movb $SETUPLEN, %al  # %al means the number of sectors to load
     movb $0x02, %ah      # %ah == 0x02 means: load sector (512 bytes) from disk to memory
-    int $INTERRUPTION_TO_LOAD_FLOPPY_DISK
-    jnc ok_load_setup    # If CF == 0, then jump to ok_load_setup; Otherwise if CF == 0, don't jump.
+    int  $INTERRUPTION_TO_LOAD_FLOPPY_DISK
+    jnc  ok_load_setup    # If CF == 0, then jump to ok_load_setup; Otherwise if CF == 0, don't jump.
     movw $0x0000, %dx
     movw $0x0000, %ax    # %ah == 0x0 means reset disk
-    int $INTERRUPTION_TO_LOAD_FLOPPY_DISK # When %ah == 0, this interruption will reset disk
-    jmp load_setup       # load setup failed, jump to load_setup to retry
+    int  $INTERRUPTION_TO_LOAD_FLOPPY_DISK # When %ah == 0, this interruption will reset disk
+    jmp  load_setup       # load setup failed, jump to load_setup to retry
 
 ok_load_setup:
     movw $msg, %ax
@@ -74,7 +74,7 @@ ok_load_setup:
     movw $MSGLEN, %cx
     movb $0, %dh             # %dh = row number from where to print characters
     movb $0, %dl             # %dl = col number from where to print characters
-    int $INTERRUPTION_TO_DISPLAY_CHARACTER
+    int  $INTERRUPTION_TO_DISPLAY_CHARACTER
 
     jmpl $SETUPSEG, $0   # Does two things, 1) set %cs = $SETUPSEG, 2) jump to $0
 
