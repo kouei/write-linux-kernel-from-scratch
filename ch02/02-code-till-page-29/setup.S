@@ -8,11 +8,11 @@ INTERRUPTION_TO_GET_EXTENDED_MEMORY_SIZE = 0x15
 
 INTERRUPTION_TO_GET_DISK_INFO = 0x13
 
-FIRST_DISK_INFO = 4 * 0x41
-
-SECOND_DISK_INFO = 4 * 0x46
-
 DISK_INFO_SIZE_IN_BYTES = 16
+
+FIRST_DISK_INFO_OFFSET = 4 * 0x41
+
+SECOND_DISK_INFO_OFFSET = 4 * 0x46
 
 .code16
 .text
@@ -72,7 +72,7 @@ _start_setup:
     # Get first disk info
     movw $0x0000, %ax
     movw %ax, %ds
-    ldsw $FIRST_DISK_INFO, %si  # It's the same as "movw $FIRST_DISK_INFO, %si", ldsw makes it clear that what stores in %si should be an address
+    ldsw (FIRST_DISK_INFO_OFFSET), %si  # It's the same as "movw $FIRST_DISK_INFO, %si", ldsw makes it clear that what stores in %si should be an address
     movw $INITSEG, %ax
     movw %ax, %es
     movw $0x0080, %di
@@ -83,7 +83,7 @@ _start_setup:
     # Get second disk info
     movw $0x0000, %ax
     movw %ax, %ds
-    ldsw $SECOND_DISK_INFO, %si # It's the same as "movw $SECOND_DISK_INFO, %si", ldsw makes it clear that what stores in %si should be an address
+    ldsw (SECOND_DISK_INFO_OFFSET), %si # It's the same as "movw $SECOND_DISK_INFO, %si", ldsw makes it clear that what stores in %si should be an address
     movw $INITSEG, %ax
     movw %ax, %es
     movw $0x0090, %di
