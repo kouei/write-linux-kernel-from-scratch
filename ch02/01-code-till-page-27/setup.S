@@ -19,7 +19,7 @@ _start_setup:
     movw $SETUP_MSG_LEN, %cx
     movb $3, %dh             # %dh = row number from where to print characters
     movb $0, %dl             # %dl = col number from where to print characters
-    int $INTERRUPTION_TO_DISPLAY_CHARACTER
+    int  $INTERRUPTION_TO_DISPLAY_CHARACTER
 
 SETUP_MSG_LEN = 16
 setup_msg:
