@@ -1,4 +1,4 @@
-RED_COLOR = 0x0c
+GREEN_COLOR = 0x0a
 
 INTERRUPTION_TO_DISPLAY_CHARACTER = 0x10
 
@@ -15,7 +15,7 @@ _start_setup:
     movw %ax, %bp
     movb $0x13, %ah          # %ah = 0x13 means display character string in teletype mode 
     movb $0x01, %al          # %al = 0x01 means character string not only contains characters, but also properties of how should we display them  (e.g., color)
-    movw $RED_COLOR, %bx
+    movw $GREEN_COLOR, %bx
     movw $SETUP_MSG_LEN, %cx
     movb $3, %dh             # %dh = row number from where to print characters
     movb $0, %dl             # %dl = col number from where to print characters
