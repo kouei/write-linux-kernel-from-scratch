@@ -48,11 +48,13 @@ go:
     movw %ax, %ds
     movw %ax, %es
     movw %ax, %ss
-    movw $0xFF00, %sp
+    movw $0xFF00, %sp    # Not necessary here, but it's a good habit to set stack pointer to a meaningful.
 
 load_setup:
-    movw $0x0000, %dx    # %dh means the id of magnetic head, %dl means drive id, 0 means floppy disk, 7 means hard disk.
-    movw $0x0002, %cx    # %ch means the lower 8 bits of cylinder id, the first 0~5 bits in %cl means start sector id, 6~7 bits means the higher 2 bits of magnetic track
+    movb $0x00, %dh      # %dh means the id of magnetic head
+    movb $0x00, %dl      # %dl means drive id, 0 means floppy disk, 7 means hard disk.
+    movb $0x00, %ch      # %ch means the lower 8 bits of cylinder id.
+    movb $0x02, %cl      # The first 0~5 bits in %cl means start sector id, 6~7 bits means the higher 2 bits of magnetic track
     movw $SECTOR_SIZE_IN_BYTES, %bx    # (%es << 4) + %bx is the address of the buffer. If there is any error, the CF bit will be set
     movb $SETUPLEN, %al  # %al means the number of sectors to load
     movb $0x02, %ah      # %ah == 0x02 means: load sector (512 bytes) from disk to memory
