@@ -9,16 +9,16 @@ linux.img: tools/build-without-system bootsect setup
 	./tools/build-without-system bootsect setup > $@
 
 tools/build-without-system: tools/build-without-system.c
-	gcc $< -o $@
+	gcc $^ -o $@
 
 bootsect: bootsect.o
-	$(LD) $< $(LDFLAG) -o $@
+	$(LD) $^ $(LDFLAG) -o $@
 
 bootsect.o: bootsect.S
-	$(AS) $< -o $@
+	$(AS) $^ -o $@
 
 setup: setup.o
-	$(LD) $< $(LDFLAG) --entry=_start_setup -o $@
+	$(LD) $^ $(LDFLAG) --entry=_start_setup -o $@
 
 .PHONY: clean
 clean:
