@@ -27,7 +27,7 @@ RED_COLOR = 0x0c
 
 .global _start
 _start:
-    jmpl $BOOTSEG, $start2
+    jmpl $BOOTSEG, $start2 # Does two things, 1) set %cs = $BOOTSEG, 2) jump to $start2 label
 
 start2:
     movw $BOOTSEG, %ax
@@ -72,7 +72,7 @@ ok_load_setup:
     movb $0, %dl         # Position of the cursor, row number = %dh, column number = %dl
     int $INTERRUPTION_TO_DISPLAY_CHARACTER
 
-    jmpl $SETUPSEG, $0
+    jmpl $SETUPSEG, $0   # Does two things, 1) set %cs = $SETUPSEG, 2) jump to $0
 
 MSGLEN = 21              # $msg length = 21
 msg:
