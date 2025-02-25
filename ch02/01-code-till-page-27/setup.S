@@ -1,7 +1,5 @@
 RED_COLOR = 0x0c
 
-SETUP_MSG_LEN = 16
-
 INTERRUPTION_TO_DISPLAY_CHARACTER = 0x10
 
 .code16
@@ -21,5 +19,7 @@ _start_setup:
     movb $3, %dh             # Start position of where to print characters, row number = %dh, column number = %dl
     movb $0, %dl
     int $INTERRUPTION_TO_DISPLAY_CHARACTER
+
+SETUP_MSG_LEN = 16
 setup_msg:
     .ascii "setup is running"
