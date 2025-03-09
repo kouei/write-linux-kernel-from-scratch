@@ -23,6 +23,9 @@ bootsect.o: bootsect.S
 setup: setup.o
 	$(LD) $^ $(LDFLAG) --entry=_start_setup -o $@
 
+setup.o: setup.S
+	$(AS) $^ -o $@
+
 .PHONY: clean
 clean:
 	rm -f *.o
@@ -30,3 +33,4 @@ clean:
 	rm -f setup
 	rm -f tools/build
 	rm -f linux.img
+	cd kernel; make clean; cd ..
