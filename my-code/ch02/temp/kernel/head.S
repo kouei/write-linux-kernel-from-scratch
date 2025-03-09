@@ -12,7 +12,7 @@ SEGMENT_SELECTOR = 0x18
 .global startup_32 # export symbol startup_32
 startup_32:
     movl $SEGMENT_SELECTOR, %eax
-    movw $ax, %gs
+    movw %ax, %gs
     movl $0x0, %edi
     movb $0xf, %ah
     movb $0x42, %al
