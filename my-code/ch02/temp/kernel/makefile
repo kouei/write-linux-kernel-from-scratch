@@ -17,5 +17,5 @@ head.o: head.S
 
 .PHONY: clean
 clean:
-	rm *.o
-	rm system
+	rm -f *.o
+	rm -f system
