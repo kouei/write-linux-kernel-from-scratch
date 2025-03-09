@@ -20,6 +20,9 @@ bootsect.o: bootsect.S
 setup: setup.o
 	$(LD) $^ $(LDFLAG) --entry=_start_setup -o $@
 
+setup.o: setup.S
+	$(AS) $^ -o $@
+
 .PHONY: clean
 clean:
 	rm -f *.o
