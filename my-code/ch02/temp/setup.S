@@ -14,9 +14,17 @@ FIRST_DISK_INFO_OFFSET = 4 * 0x41
 
 SECOND_DISK_INFO_OFFSET = 4 * 0x46
 
+SECTOR_SIZE_IN_BYTES = 512
+
+SETUPSEG = ((INITSEG << 4) + SECTOR_SIZE_IN_BYTES) >> 4
+
 .code16
-.text
+.text # Specify the following part should be put into Code Segment.
 .globl _start_setup
+
+SETUP_MSG_LEN = 16
+setup_msg:
+    .ascii "setup is running"
 
 _start_setup:
     movw %cs, %ax
@@ -112,7 +120,101 @@ no_disk1:
 
     # If there is second disk (disk1)
 is_disk1:
+    # Prepare to enter protected mode
+    cli # Clear Interrupt Flag, prevent the CPU from handling hardware interruption
 
-SETUP_MSG_LEN = 16
-setup_msg:
-    .ascii "setup is running"
+    movw $0x0000, %ax
+    cld # Clear Direction Flag, set DF Flag to 0
+
+do_move:
+    movw %ax, %es
+    addw $0x1000, %ax
+    cmpw $0x9000, %ax
+    jz end_move # If ZF Flag is 1, then jump
+    movw %ax, %ds
+    subw %di, %di
+    subw %si, %si
+    movw $0x8000, %cx # Each loop copy 0x8000 words which is 0x10000 bytes
+    rep
+    movsw
+    jmp do_move
+
+end_move:
+    movw $0xb800, %ax
+    movw %ax, %gs
+    movb $0xf, %ah
+    movb $0x41, %al
+    movl $0x100, %edi
+    movw %ax, %gs:(%di)
+    movw $SETUPSEG, %ax
+    movw %ax, %ds    
+    lgdt gdt_48 # Load Global Descriptor Table Register
+
+    call empty_8042
+    movb $0xD1, %al
+    outb %al, $0x64
+    call empty_8042
+    movb $0xDF, %al
+    outb %al, $0x60
+    call empty_8042
+
+    movl %cr0, %eax
+    xorb $1, %al
+    movl %eax, %cr0
+
+    .byte 0x66, 0xea # store immediate values 0x66 (1 bytes) and 0xea (1 byte) in current segment
+    .long 0x0        # store immediate value 0x0 (4 bytes) in current segment
+    .word 0x8        # store immediate value 0x8 (2 bytes) in current segment
+
+empty_8042:
+    .word 0x00eb, 0x00eb
+    inb $0x64, %al
+    testb $2, %al
+    jnz empty_8042
+    ret
+
+gdt:
+    # Please refer to Book Page 32 for the structure of Segment Descriptor
+
+    # Descriptor 1:
+    # Reserved by CPU, it must be all 0.
+    .word 0,0,0,0
+
+    # Descriptor 2
+    # This descriptor is for Code Segment
+    # -------------------------------------------------------------------------
+    # | Byte 7 | Byte 6 | Byte 5 | Byte 4 | Byte 3 | Byte 2 | Byte 1 | Byte 0 |
+    # -------------------------------------------------------------------------
+    # | 0x00   | 0xC0   | 0x9A   | 0x00   | 0x00   | 0x00   | 0x07   | 0xFF   |
+    # -------------------------------------------------------------------------
+    .word 0x07FF
+    .word 0x0000
+    .word 0x9A00
+    .word 0x00C0
+
+    # Descriptor 3
+    # This descriptor is for Data Segment
+    # -------------------------------------------------------------------------
+    # | Byte 7 | Byte 6 | Byte 5 | Byte 4 | Byte 3 | Byte 2 | Byte 1 | Byte 0 |
+    # -------------------------------------------------------------------------
+    # | 0x00   | 0xC0   | 0x92   | 0x00   | 0x00   | 0x00   | 0x07   | 0xFF   |
+    # -------------------------------------------------------------------------
+    .word 0x07FF
+    .word 0x0000
+    .word 0x9200
+    .word 0x00C0
+
+    # Descriptor 4
+    # -------------------------------------------------------------------------
+    # | Byte 7 | Byte 6 | Byte 5 | Byte 4 | Byte 3 | Byte 2 | Byte 1 | Byte 0 |
+    # -------------------------------------------------------------------------
+    # | 0x00   | 0xC0   | 0x92   | 0x0B   | 0x80   | 0x00   | 0xFF   | 0xFF   |
+    # -------------------------------------------------------------------------
+    .word 0xFFFF
+    .word 0x8000
+    .word 0x920B
+    .word 0x00C0
+
+gdt_48:
+    .word 0x800
+    .word 512 + gdt, 0x9
