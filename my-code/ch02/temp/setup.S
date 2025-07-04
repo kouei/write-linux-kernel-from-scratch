@@ -158,6 +158,7 @@ end_move:
     outb %al, $0x60
     call empty_8042
 
+    # Set the lowest bit of %cr0 to 0 to turn on Protected Mode.
     movl %cr0, %eax
     xorb $1, %al
     movl %eax, %cr0
@@ -176,8 +177,20 @@ empty_8042:
 gdt:
     # Please refer to Book Page 32 for the structure of Segment Descriptor
 
+    # Meaning of each byte in Segment Descriptor
+    # --------------------------------------------------------------------------------
+    # | Byte 7        | Byte 6 | Byte 5 | Byte 4 | Byte 3 | Byte 2 | Byte 1 | Byte 0 |
+    # --------------------------------------------------------------------------------
+    # | Base(31...24) | Attributes      | Base(23...0)             | Limit(15...0)   |
+    # --------------------------------------------------------------------------------
+
     # Descriptor 1:
     # Reserved by CPU, it must be all 0.
+    # -------------------------------------------------------------------------
+    # | Byte 7 | Byte 6 | Byte 5 | Byte 4 | Byte 3 | Byte 2 | Byte 1 | Byte 0 |
+    # -------------------------------------------------------------------------
+    # | 0x00   | 0x00   | 0x00   | 0x00   | 0x00   | 0x00   | 0x00   | 0x00   |
+    # -------------------------------------------------------------------------
     .word 0,0,0,0
 
     # Descriptor 2
